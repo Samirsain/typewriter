@@ -12,8 +12,12 @@ export default function GSAPProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    // ScrollTrigger normalize — removes scroll jank
-    ScrollTrigger.normalizeScroll(true);
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+    // ScrollTrigger normalize — removes scroll jank, but breaks native touch scroll on mobile
+    if (!isMobile) {
+      ScrollTrigger.normalizeScroll(true);
+    }
 
     // Custom smooth scroll using GSAP ticker
     let currentY = 0;
@@ -22,7 +26,7 @@ export default function GSAPProvider({
 
     const onWheel = (e: WheelEvent) => {
       // Don't normalize on touch devices, let native handle it
-      if (window.matchMedia("(max-width: 768px)").matches) return;
+      if (isMobile) return;
       
       e.preventDefault();
       targetY += e.deltaY;
@@ -33,19 +37,24 @@ export default function GSAPProvider({
     };
 
     const tick = () => {
+      if (isMobile) return;
       currentY += (targetY - currentY) * ease;
       window.scrollTo(0, currentY);
       ScrollTrigger.update();
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false });
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0); // jank remove
+    if (!isMobile) {
+      window.addEventListener("wheel", onWheel, { passive: false });
+      gsap.ticker.add(tick);
+      gsap.ticker.lagSmoothing(0); // jank remove
+    }
 
     return () => {
-      window.removeEventListener("wheel", onWheel);
-      gsap.ticker.remove(tick);
-      ScrollTrigger.normalizeScroll(false);
+      if (!isMobile) {
+        window.removeEventListener("wheel", onWheel);
+        gsap.ticker.remove(tick);
+        ScrollTrigger.normalizeScroll(false);
+      }
     };
   }, []);
 
