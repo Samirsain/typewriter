@@ -1,0 +1,292 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-cormorant: "Cormorant Garamond";
+    --font-dancing:   "Dancing Script";
+    --font-lora:      "Lora";
+    --cream-100: #FAF7F2;
+    --cream-200: #F5EFE4;
+    --brown-400: #A87B52;
+    --brown-800: #2C1810;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream-100 text-brown-800 antialiased;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    -webkit-overflow-scrolling: touch;
+  }
+
+  ::selection {
+    @apply bg-brown-500 text-cream-50;
+  }
+
+  /* custom scrollbar — desktop only */
+  @media (min-width: 768px) {
+    ::-webkit-scrollbar       { width: 6px; }
+    ::-webkit-scrollbar-track { @apply bg-cream-200; }
+    ::-webkit-scrollbar-thumb { @apply bg-brown-400 rounded-full; }
+  }
+
+  /* Mobile touch optimizations */
+  a, button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  .text-shadow-warm {
+    text-shadow: 2px 4px 20px rgba(139, 94, 60, 0.18);
+  }
+
+  .painting-frame {
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.05),
+      0 20px 40px -10px rgba(0, 0, 0, 0.12),
+      0 30px 60px -15px rgba(0, 0, 0, 0.08);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .painting-frame-hover {
+    box-shadow:
+      0 20px 25px -5px rgba(0, 0, 0, 0.08),
+      0 40px 80px -20px rgba(0, 0, 0, 0.18),
+      0 50px 100px -25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+  }
+
+  /* ─── 3D Canvas Box (gallery product cards) ─── */
+  .canvas-box {
+    perspective: 1200px;
+    position: relative;
+  }
+
+  .canvas-box-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    transform-style: preserve-3d;
+    transform: rotateY(-3deg) rotateX(1deg);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .canvas-box:hover .canvas-box-inner {
+    transform: rotateY(0deg) rotateX(0deg) translateY(-6px);
+  }
+
+  /* Front face — the image */
+  .canvas-front {
+    position: absolute;
+    inset: 0;
+    background: var(--cream-200);
+    box-shadow:
+      0 8px 30px rgba(0, 0, 0, 0.10),
+      0 20px 50px rgba(0, 0, 0, 0.06);
+  }
+
+  .canvas-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Right side edge — gives depth */
+  .canvas-side-right {
+    position: absolute;
+    top: 0;
+    right: -12px;
+    width: 12px;
+    height: 100%;
+    background: linear-gradient(to right, #d4c4a8, #c9b898);
+    transform: rotateY(90deg);
+    transform-origin: left center;
+    box-shadow: inset -2px 0 6px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Bottom edge — table shadow */
+  .canvas-side-bottom {
+    position: absolute;
+    bottom: -12px;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background: linear-gradient(to bottom, #d4c4a8, #c2b28a);
+    transform: rotateX(-90deg);
+    transform-origin: top center;
+    box-shadow: inset 0 -2px 6px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Canvas shadow on ground */
+  .canvas-box::after {
+    content: "";
+    position: absolute;
+    bottom: -18px;
+    left: 8%;
+    right: 8%;
+    height: 20px;
+    background: radial-gradient(ellipse, rgba(0, 0, 0, 0.12) 0%, transparent 70%);
+    filter: blur(4px);
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+
+  .canvas-box:hover::after {
+    opacity: 0.6;
+  }
+
+  /* Scrollbar hide utility */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ─── Skiper30 Parallax Styles ─── */
+  .skiper-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--cream-100);
+    overflow: hidden;
+  }
+
+  .intro-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .scroll-hint-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .scroll-hint {
+    font-family: var(--font-lora, serif);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--brown-400);
+    animation: animate-pulse 2s infinite;
+  }
+
+  .gallery-grid {
+    position: relative;
+    height: 175vh;
+    display: flex;
+    gap: 2vw;
+    padding: 2vw;
+    background: var(--cream-200);
+    overflow: hidden;
+  }
+
+  .gallery-column {
+    position: relative;
+    height: 100%;
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+    min-width: 120px;
+  }
+
+  .gallery-column:nth-child(1) { top: -45%; }
+  .gallery-column:nth-child(2) { top: -95%; }
+  .gallery-column:nth-child(3) { top: -45%; }
+  .gallery-column:nth-child(4) { top: -75%; }
+
+  .gallery-image-wrapper {
+    height: 33%;
+    width: 100%;
+    position: relative;
+    border-radius: 1vw;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ─── Mobile: 2 columns for parallax ─── */
+  @media (max-width: 639px) {
+    .skiper-container {
+      height: auto;
+      min-height: 80vh;
+    }
+
+    .gallery-grid {
+      height: 120vh;
+      gap: 3vw;
+      padding: 3vw;
+      touch-action: pan-y;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .gallery-column {
+      width: 50%;
+      min-width: 0;
+    }
+
+    .gallery-column:nth-child(3),
+    .gallery-column:nth-child(4) {
+      display: none;
+    }
+
+    .gallery-column:nth-child(1) { top: -30%; }
+    .gallery-column:nth-child(2) { top: -60%; }
+
+    .scroll-hint {
+      font-size: 0.6rem;
+    }
+
+    /* Simplify 3D canvas on mobile for performance */
+    .canvas-box-inner {
+      transform: none;
+    }
+    .canvas-box:hover .canvas-box-inner {
+      transform: translateY(-4px);
+    }
+    .canvas-side-right {
+      display: none;
+    }
+    .canvas-side-bottom {
+      display: none;
+    }
+    .canvas-box::after {
+      display: none;
+    }
+  }
+
+  /* ─── Tablet: 3 columns ─── */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .gallery-column:nth-child(4) {
+      display: none;
+    }
+
+    .gallery-column {
+      width: 33.33%;
+    }
+  }
+}
+
+@keyframes animate-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
